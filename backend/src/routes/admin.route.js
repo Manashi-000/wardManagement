@@ -2,23 +2,30 @@ import { Router } from "express";
 import multer from "multer";
 
 import {
-  createPost,
-  updatePost,
-  deletePost,
-  getPost,
-  getPosts,
+	createPost,
+	updatePost,
+	deletePost,
+	getPost,
+	getPosts,
 } from "../controllers/admin.controller.js";
 
-import { getOrganizations, getOrganization } from "../controllers/organization.controller.js";
+import {
+	getOrganizations,
+	getOrganization,
+} from "../controllers/organization.controller.js";
+import { adminAuthMiddleware } from "../middlewares/user.auth.js";
 
 const router = Router();
+
+router.use(adminAuthMiddleware);
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); 
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
+	destination: (req, file, cb) => {
+		cb(null, "uploads/");
+	},
+	filename: (req, file, cb) => {
+		cb(null, Date.now() + "-" + file.originalname);
+	},
 });
 
 const upload = multer({ storage });
