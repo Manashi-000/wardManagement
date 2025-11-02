@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id         String      @id @default(cuid())
+  username   String
+  email      String      @unique
+  googleId   String      @unique
+  image      String
+  createdAt  DateTime    @default(now())
+  role       Role        @default(USER)
+  complaints Complaint[]
+}
+
+enum Category {
+  ROAD
+  ELECTRICITY
+  EDUCATION
+  WATER
+  DRAINAGE
+  OTHERS
+}
+
+enum Status {
+  REGISTERED
+  INPROGRESS
+  RESOLVED
+}
+
+model Complaint {
+  id             String   @id @default(cuid())
+  subject        String
+  description    String
+  images         String[]
+  taggedLocation String
+  category       Category
+  User           User?    @relation(fields: [userId], references: [id])
+  userId         String?
+
+  response String?
+  status   Status
+
+  // @@unique([subject, userId])
+}
+
+model Organization {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  image         String
+  description   String
+  establishedAt DateTime
+  events        Event[]
+  policies      Policy[]
+  budgets       Budget[]
+  latitude      Decimal
+  longitude     Decimal
+}
+
+model Event {
+  id               String       @id @default(cuid())
+  Organization     Organization @relation(fields: [organizationId], references: [id])
+  organizationId   String
+  name             String
+  eventDescription String
+  createdAt        String
+}
+
+model Budget {
+  id             String       @id @default(cuid())
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  name           String
+  amount         Int
+}
+
+model Policy {
+  id                String       @id @default(cuid())
+  policyName        String
+  policyDescription String
+  createAt          DateTime
+  Organization      Organization @relation(fields: [organizationId], references: [id])
+  organizationId    String
+}
+
+model WardPost {
+  id              String   @id @default(cuid())
+  postname        String
+  postDescription String
+  image           String[]
+  createdAt       DateTime @default(now())
+}
+
+model Emergency {
+  id             String @id @default(cuid())
+  public_service String
+  contact        String
+  description    String
+  icon           String
+}
+
+model Member {
+  id              Int              @id @default(autoincrement())
+  name            String
+  position        String
+  image           String?
+  contactNumber   String
+  classification  MemberType       @default(REPRESENTATIVE)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+enum MemberType {
+  REPRESENTATIVE
+  PUBLIC_SERVICE
+}
+
