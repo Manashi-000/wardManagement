@@ -32,8 +32,6 @@
 //     }
 //   }, []);
 
-
-
 //   return (
 //     <View style={styles.container}>
 //       <MapView ref={mapRef} style={styles.map}>
@@ -87,7 +85,6 @@
 //   },
 // });
 
-
 // import React from "react";
 // import { StyleSheet, View, Dimensions } from "react-native";
 // import MapView, { Marker } from "react-native-maps";
@@ -125,50 +122,183 @@
 //   },
 // });
 
-import { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
-import { WebView } from "react-native-webview";
+// import { useEffect, useState } from "react";
+// import {
+// 	ActivityIndicator,
+// 	View,
+// 	Text,
+// 	StyleSheet,
+// 	Dimensions,
+// } from "react-native";
+// import { WebView } from "react-native-webview";
+// import MapView, { Marker } from "react-native-maps";
 
-export default function MapScreen() {
-  const [mapUrl, setMapUrl] = useState(null);
+// export default function MapScreen() {
+// 	const [mapUrl, setMapUrl] = useState(null);
+// 	const [loading, setLoading] = useState(true);
+// 	const [error, setError] = useState(false);
 
-  useEffect(() => {
-    const fetchOrganizations = async () => {
-      try {
-        // 👇 replace with your actual PC IP
-        const BASE_URL = "http://192.168.1.94:8000";
+// 	useEffect(() => {
+// 		const fetchOrganizations = async () => {
+// 			try {
+// 				const BASE_URL = "http://10.0.2.2:8000"; // change for real device if needed
+// 				const res = await fetch(
+// 					`${BASE_URL}/api/v1/organizations/get-organizations`
+// 				);
+// 				const json = await res.json();
+// 				console.log("Fetched data:", json);
 
-        const res = await fetch(`${BASE_URL}/api/v1/organizations/get-organizations`);
-        const json = await res.json();
+// 				if (
+// 					!json.success ||
+// 					!Array.isArray(json.data) ||
+// 					json.data.length === 0
+// 				) {
+// 					console.warn("No organizations found");
+// 					setError(true);
+// 					return;
+// 				}
 
-        if (!json.success || !json.data || json.data.length === 0) {
-          console.error("No organizations found");
-          return;
-        }
+// 				const start = json.data[0]?.name;
+// 				const waypoints = json.data
+// 					.slice(1)
+// 					.map((org) => encodeURIComponent(org.name))
+// 					.join("/");
 
-        // First org = start
-        const start = json.data[0].name;
-        // Others = waypoints
-        const waypoints = json.data.slice(1).map(org => org.name).join("/");
+// 				const url = `https://www.google.com/maps/dir/${encodeURIComponent(
+// 					start
+// 				)}/${waypoints}`;
+// 				console.log("Map URL:", url);
 
-        // Google Maps directions link
-        const url = `https://www.google.com/maps/dir/${encodeURIComponent(start)}/${encodeURIComponent(waypoints)}`;
-        setMapUrl(url);
-      } catch (error) {
-        console.error("Error fetching organizations:", error);
-      }
-    };
+// 				if (!start || !url.includes("google.com")) {
+// 					setError(true);
+// 				} else {
+// 					setMapUrl(url);
+// 				}
+// 			} catch (err) {
+// 				console.error("Error fetching organizations:", err);
+// 				setError(true);
+// 			} finally {
+// 				setLoading(false);
+// 			}
+// 		};
 
-    fetchOrganizations();
-  }, []);
+// 		fetchOrganizations();
+// 	}, []);
 
-  if (!mapUrl) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="blue" />
-      </View>
-    );
-  }
+// 	// Loading spinner while fetching
+// 	if (loading) {
+// 		return (
+// 			<View style={styles.center}>
+// 				<ActivityIndicator
+// 					size="large"
+// 					color="blue"
+// 				/>
+// 			</View>
+// 		);
+// 	}
 
-  return <WebView source={{ uri: mapUrl }} style={{ flex: 1 }} />;
-}
+// 	// Fallback map when URL fails
+// 	if (error || !mapUrl) {
+// 		return (
+// 			<View style={styles.container}>
+// 				<MapView
+// 					style={styles.map}
+// 					initialRegion={{
+// 						latitude: 27.7172, // Kathmandu as fallback
+// 						longitude: 85.324,
+// 						latitudeDelta: 0.05,
+// 						longitudeDelta: 0.05,
+// 					}}
+// 				>
+// 					<Marker
+// 						coordinate={{ latitude: 27.7172, longitude: 85.324 }}
+// 						title="Fallback Location"
+// 						description="Could not load directions"
+// 					/>
+// 				</MapView>
+
+// 				<View style={styles.overlay}>
+// 					<Text style={styles.text}>Showing fallback map</Text>
+// 				</View>
+// 			</View>
+// 		);
+// 	}
+
+// 	// WebView if URL is valid
+// 	return (
+// 		<WebView
+// 			source={{ uri: mapUrl }}
+// 			style={{ flex: 1 }}
+// 		/>
+// 	);
+// }
+
+// const styles = StyleSheet.create({
+// 	container: {
+// 		flex: 1,
+// 	},
+// 	map: {
+// 		width: Dimensions.get("window").width,
+// 		height: Dimensions.get("window").height,
+// 	},
+// 	center: {
+// 		flex: 1,
+// 		justifyContent: "center",
+// 		alignItems: "center",
+// 	},
+// 	overlay: {
+// 		position: "absolute",
+// 		bottom: 40,
+// 		alignSelf: "center",
+// 		backgroundColor: "rgba(0,0,0,0.6)",
+// 		paddingHorizontal: 12,
+// 		paddingVertical: 6,
+// 		borderRadius: 8,
+// 	},
+// 	text: {
+// 		color: "#fff",
+// 		fontSize: 14,
+// 	},
+// });
+
+import Constants from "expo-constants";
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+
+const API_URL = Constants.expoConfig?.extra?.backendURL;
+
+console.log("this is backend url", API_URL);
+const MapScreen = () => {
+	return (
+		<View style={styles.container}>
+			<MapView
+				style={styles.map}
+				initialRegion={{
+					latitude: 37.78825,
+					longitude: -122.4324,
+					latitudeDelta: 0.0922,
+					longitudeDelta: 0.0421,
+				}}
+			>
+				<Marker
+					coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
+					title="San Francisco"
+					description="The city by the bay"
+				/>
+			</MapView>
+		</View>
+	);
+};
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+	map: {
+		width: "100%",
+		height: "100%",
+	},
+});
+
+export default MapScreen;

@@ -5,6 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Slider from "../../components/slider";
+
 export default function Home() {
   const router = useRouter();
 
