@@ -37,8 +37,8 @@ export default function TabsLayout() {
 						let iconName;
 
 						switch (route.name) {
-							case "map":
-								iconName = focused ? "map" : "map-outline";
+							case "organizations":
+								iconName = focused ? "organization" : "organization-outline";
 								break;
 							case "home":
 								iconName = focused ? "home" : "home-outline";
@@ -78,9 +78,9 @@ export default function TabsLayout() {
 				/>
 
 				<Tabs.Screen
-					name="map"
+					name="organizations"
 					options={{
-						title: "Map",
+						title: "Organizations",
 						tabBarButton: (props) => (
 							<TouchableOpacity
 								{...props}

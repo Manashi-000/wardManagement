@@ -1,5 +1,6 @@
 import { complaintsFromUserSchema, adminRespondSchema } from "../utils/validation/complaint.validation.js"
 import { prisma } from "../utils/validation/prismaClient.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 export const createComplaints = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ export const createComplaints = async (req, res) => {
     // Parse body using Zod but cast strings to correct types
     const parsedData = complaintsFromUserSchema.safeParse({
       ...req.body,
-      images: req.files?.map((file) => file.filename) || []
+      images: req.files?.map((file) => file.path) || []
     });
 
     if (!parsedData.success) {
@@ -22,13 +23,20 @@ export const createComplaints = async (req, res) => {
     }
 
     const userId = req.user?.id || parsedData.data.userId || null;
+    const uploadedImagesUrl = []
+    await Promise.all([
+      parsedData.data.images.map(async (filename) => {
+        const uploadResult = await uploadOnCloudinary(filename, "/wardmanagement/complaints")
+        console.log("upload result", uploadResult)
+        uploadedImagesUrl.push(uploadResult.url)
+      })
+    ])
 
-    // Create complaint
     const createdComplaint = await prisma.complaint.create({
       data: {
         subject: parsedData.data.subject,
         description: parsedData.data.description,
-        images: parsedData.data.images, // saved as filenames
+        images: uploadedImagesUrl, 
         taggedLocation: parsedData.data.taggedLocation,
         category: parsedData.data.category,
         status: parsedData.data.status || "PENDING",
@@ -53,7 +61,7 @@ export const createComplaints = async (req, res) => {
 
 
 export const updateComplaints = async (req, res) => {
-  const {complaintID} = req.params;
+  const { complaintID } = req.params;
   if (!complaintID) {
     res.status(400).json({ message: "Complaint id not found." })
     return
@@ -123,7 +131,7 @@ export const getComplaint = async (req, res) => {
       res.status(400).json({ message: "Complaint doesnot exist" })
       return
     }
-    res.status(200).json({ message: "Complaint found", data: complaintExist  })
+    res.status(200).json({ message: "Complaint found", data: complaintExist })
   } catch (error) {
     res.status(500).json({ message: "Internal server error" })
   }
@@ -179,5 +187,22 @@ export const adminRespondToComplaint = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+export const getActiveComplaintCount = async (req, res) => {
+  try {
+    const count = await prisma.complaint.count({
+      where: {
+        status: {
+          not: "RESOLVED",
+        },
+      },
+    });
+
+    res.status(200).json({ count });
+  } catch (error) {
+    console.error("Error fetching complaint count:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

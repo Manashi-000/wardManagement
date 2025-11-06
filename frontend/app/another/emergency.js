@@ -8,32 +8,35 @@ import {
   Linking,
   ActivityIndicator,
   Image,
-  Platform,
 } from "react-native";
 import { Link } from "expo-router";
+
+import Constants from "expo-constants";
+
+const API_URL = Constants.expoConfig?.extra?.backendURL;
+
+console.log("this is backend url", API_URL);
 
 const EmergencyContacts = () => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const getBaseUrl = () => {
-    if (Platform.OS === "android") return "http://10.0.2.2:8000"; // Android emulator
-    return "http://192.168.1.94:8000"; // iOS simulator or real device
-  };
-
-  const BASE_URL = getBaseUrl();
-
+  // ✅ Fetch data from backend
   const fetchContacts = async () => {
     try {
-      console.log("Fetching from:", `${BASE_URL}/api/v1/emergency/get-emergencies`);
-      const res = await fetch(`${BASE_URL}/api/v1/emergency/get-emergencies`);
+      const endpoint = `${API_URL}/emergency/get-emergencies`;
+      console.log("Fetching from:", endpoint);
+
+      const res = await fetch(endpoint);
+      console.log("this is response", res)
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || "Failed to load contacts");
 
       setContacts(data.data || []);
     } catch (err) {
+      console.log("this is the error in emergency", err)
       console.log("Fetch error:", err.message);
       setError(err.message || "Network error");
     } finally {
@@ -62,14 +65,21 @@ const EmergencyContacts = () => {
         <View style={styles.introBox}>
           <Text style={styles.introTitle}>Dear Citizen,</Text>
           <Text style={styles.introText}>
-            Your safety is our priority. Here are the important emergency services you may need at any time.
+            Your safety is our priority. Here are the important emergency
+            services you may need at any time.
           </Text>
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#003083" style={{ marginTop: 30 }} />
+          <ActivityIndicator
+            size="large"
+            color="#003083"
+            style={{ marginTop: 30 }}
+          />
         ) : error ? (
-          <Text style={{ color: "red", textAlign: "center", marginTop: 20 }}>{error}</Text>
+          <Text style={{ color: "red", textAlign: "center", marginTop: 20 }}>
+            {error}
+          </Text>
         ) : (
           contacts.map((contact) => (
             <TouchableOpacity
@@ -81,7 +91,11 @@ const EmergencyContacts = () => {
               <View style={styles.iconBox}>
                 <Image
                   source={{ uri: contact.icon }}
-                  style={{ width: 30, height: 30, resizeMode: "contain" }}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    resizeMode: "contain",
+                  }}
                 />
               </View>
               <View style={styles.info}>
@@ -101,9 +115,24 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#f2f6ff" },
   container: { padding: 20, paddingBottom: 40, marginTop: 15 },
   headerRow: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
-  headerText: { fontSize: 20, fontWeight: "bold", color: "#003083", marginLeft: 12 },
-  introBox: { backgroundColor: "#e6f0ff", padding: 15, borderRadius: 12, marginBottom: 20 },
-  introTitle: { fontSize: 16, fontWeight: "bold", color: "#003083", marginBottom: 5 },
+  headerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#003083",
+    marginLeft: 12,
+  },
+  introBox: {
+    backgroundColor: "#e6f0ff",
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  introTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#003083",
+    marginBottom: 5,
+  },
   introText: { fontSize: 14, color: "#003083", lineHeight: 20 },
   card: {
     flexDirection: "row",

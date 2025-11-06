@@ -17,7 +17,6 @@ import { adminAuthMiddleware } from "../middlewares/user.auth.js";
 
 const router = Router();
 
-router.use(adminAuthMiddleware);
 
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
@@ -29,13 +28,12 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
-router.get("/getOrganization/:organizationID", getOrganization);
+router.get("/get-organization/:organizationID", getOrganization);
 router.get("/get-organizations", getOrganizations);
 router.get("/get-post/:postID", getPost);
 router.get("/get-posts", getPosts);
-router.post("/create-post", upload.array("images"), createPost);
-router.put("/update-post/:postID", upload.array("images"), updatePost);
-router.delete("/delete-post/:postID", deletePost);
+router.post("/create-post", upload.array("images"),adminAuthMiddleware, createPost);
+router.put("/update-post/:postID", upload.array("images"), adminAuthMiddleware,updatePost);
+router.delete("/delete-post/:postID",adminAuthMiddleware,deletePost);
 
 export default router;

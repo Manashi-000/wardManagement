@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createEmergency,getEmergencies,getEmergency,updateEmergency,deleteEmergency} from "../controllers/emergency.controller.js";
 const router = Router()
 
+import { adminAuthMiddleware } from "../middlewares/user.auth.js";
 import multer from "multer";
 import path from "path";
 
@@ -23,9 +24,9 @@ router.post("/upload-icon", upload.single("icon"), (req, res) => {
   res.json({ url: fileUrl });
 });
 
-router.route("/create-emergency").post(createEmergency)
-router.route("/delete-emergency/:emergencyID").delete(deleteEmergency)
-router.route("/update-emergency/:emergencyID").put(updateEmergency)
+router.route("/create-emergency").post(adminAuthMiddleware,createEmergency)
+router.route("/delete-emergency/:emergencyID").delete(adminAuthMiddleware,deleteEmergency)
+router.route("/update-emergency/:emergencyID").put(adminAuthMiddleware,updateEmergency)
 router.route("/get-emergency/:emergencyID").get(getEmergency)
 router.route("/get-emergencies").get(getEmergencies)
 

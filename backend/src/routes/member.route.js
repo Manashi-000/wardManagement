@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import {
   createMember,
   getMembers,
@@ -9,10 +10,19 @@ import {
 
 const router = express.Router();
 
-router.route("/create-member").post(createMember);
-router.route("/delete-member/:id").delete(deleteMember);
-router.route("/update-member/:id").put(updateMember);
-router.route("/get-member/:id").get(getMember);
-router.route("/get-members").get(getMembers);
+// Multer setup
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+});
+
+const upload = multer({ storage });
+
+// Routes
+router.post("/create-member", upload.single("image"), createMember);
+router.put("/update-member/:id", upload.single("image"), updateMember);
+router.delete("/delete-member/:id", deleteMember);
+router.get("/get-member/:id", getMember);
+router.get("/get-members", getMembers);
 
 export default router;

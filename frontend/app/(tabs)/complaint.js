@@ -7,40 +7,47 @@ import {
   ScrollView,
   Alert,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
 import RNPickerSelect from "react-native-picker-select";
+import Constants from "expo-constants";
 
+
+const API_URL = Constants.expoConfig?.extra?.backendURL;
+console.log("this is backend url in complaint", API_URL)
 export default function ComplaintScreen() {
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
   const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const API_BASE = "http://192.168.1.100:8000/api/v1/complaints";
 
-  // 📸 Pick Image
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaType.Images,
-      quality: 0.7,
       allowsMultipleSelection: true,
+      quality: 0.7,
     });
 
     if (!result.canceled) {
-      setImages([...images, ...result.assets.map((a) => a.uri)]);
+      setImages((prev) => [...prev, ...result.assets.map((a) => a.uri)]);
     }
   };
 
-  // 📤 Submit Complaint
   const handleSubmit = async () => {
+    if (!subject || !description || !location || !category) {
+      Alert.alert("⚠️ Missing Info", "Please fill in all required fields.");
+      return;
+    }
+
+    setLoading(true);
     try {
       const formData = new FormData();
-
       formData.append("subject", subject);
       formData.append("description", description);
       formData.append("taggedLocation", location);
@@ -54,25 +61,38 @@ export default function ComplaintScreen() {
         });
       });
 
-      await axios.post(`${API_BASE}/create-complaints/`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const endpoint = `${API_URL}/complaints/create-complaints/`;
+      console.log("📡 Sending to:", endpoint);
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        body: formDataa,
       });
 
-      Alert.alert("✅ Success", "Complaint submitted");
+      const data = await res.json();
+      console.log("✅ Complaint response:", data);
+
+      if (!res.ok) throw new Error(data.message || "Failed to submit");
+
+      Alert.alert("✅ Success", "Complaint submitted successfully!");
       setSubject("");
       setDescription("");
       setLocation("");
       setCategory("");
       setImages([]);
     } catch (err) {
-      console.log("Upload error:", err.response?.data || err.message);
+      console.log("❌ Upload error:", err.message);
       Alert.alert("❌ Error", "Failed to submit complaint");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <ScrollView className="flex-1 bg-white px-4 py-10">
-      {/* Header */}
       <View className="flex-row items-center mb-4">
         <Link href="/(tabs)/home">
           <Ionicons name="arrow-back" size={24} color="#003083" />
@@ -82,15 +102,12 @@ export default function ComplaintScreen() {
         </Text>
       </View>
 
-      {/* Subject */}
       <TextInput
         placeholder="Subject"
         value={subject}
         onChangeText={setSubject}
         className="bg-gray-100 rounded-lg p-4 text-sm mb-4"
       />
-
-      {/* Description */}
       <TextInput
         placeholder="Describe your complaint"
         value={description}
@@ -99,8 +116,6 @@ export default function ComplaintScreen() {
         numberOfLines={6}
         className="bg-gray-100 rounded-lg p-4 text-sm mb-4 text-[#111]"
       />
-
-      {/* Upload Images */}
       <Text className="text-base font-semibold mb-2 text-[#003083]">
         Add Media
       </Text>
@@ -141,7 +156,7 @@ export default function ComplaintScreen() {
       </Text>
       <View className="bg-gray-100 rounded-lg mb-8">
         <RNPickerSelect
-          onValueChange={(value) => setCategory(value)}
+          onValueChange={setCategory}
           items={[
             { label: "Road", value: "ROAD" },
             { label: "Water", value: "WATER" },
@@ -163,11 +178,17 @@ export default function ComplaintScreen() {
       {/* Submit Button */}
       <TouchableOpacity
         onPress={handleSubmit}
-        className="bg-[#003083] py-4 rounded-xl mb-8"
+        disabled={loading}
+        className={`py-4 rounded-xl mb-8 ${loading ? "bg-gray-400" : "bg-[#003083]"
+          }`}
       >
-        <Text className="text-center text-white font-semibold text-base">
-          Submit Complaint
-        </Text>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text className="text-center text-white font-semibold text-base">
+            Submit Complaint
+          </Text>
+        )}
       </TouchableOpacity>
     </ScrollView>
   );

@@ -121,3 +121,16 @@ export const loginController = async (req, res) => {
 		res.status(500).json({ message: "Internal server error" });
 	}
 };
+
+export const getUserCount = async (req, res) => {
+  try {
+    const count = await prisma.user.count({
+      where: { role: "USER" }, 
+    });
+
+    res.status(200).json({ count });
+  } catch (error) {
+    console.error("Error fetching user count:", error);
+    res.status(500).json({ message: "Failed to fetch user count" });
+  }
+};

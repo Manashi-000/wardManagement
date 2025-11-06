@@ -108,12 +108,14 @@ model WardPost {
   createdAt       DateTime @default(now())
 }
 
+
+
 model Emergency {
   id             String @id @default(cuid())
   public_service String
   contact        String
   description    String
-  icon           String
+  icon           String 
 }
 
 model Member {
@@ -132,3 +134,20 @@ enum MemberType {
   PUBLIC_SERVICE
 }
 
+model Document {
+  id               String       @id @default(cuid())
+  name             String
+  requirements     String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  fileUrl          String
+}
+
+model Tax {
+  id               String       @id @default(cuid())
+  name             String
+  requirements     String
+  amount           Float
+  dueDate          DateTime
+  createdAt        DateTime     @default(now())
+}

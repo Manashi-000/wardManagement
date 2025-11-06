@@ -3,6 +3,7 @@ import { prisma } from "../utils/validation/prismaClient.js"
 
 export const getOrganization = async (req, res) => {
     const { organizationID } = req.params;
+    console.log("this is org id", organizationID)
     if (!organizationID) {
         res.status(400).json({ message: "Organization ID required" })
         return

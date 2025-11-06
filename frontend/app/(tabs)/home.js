@@ -10,7 +10,7 @@ export default function Home() {
   const router = useRouter();
 
   const quickAccess = [
-    { label: 'Notices', icon: 'flag', route: '/another/notice' },
+    { label: 'Tax Detail', icon: 'credit-card', route: '/another/tax' },
     { label: 'Document Details', icon: 'file-text', route: '/another/documents' },
     { label: 'Member Detail', icon: 'user', route: '/another/member' },
     { label: 'Emergency Contact', icon: 'phone', route: '/another/emergency' },

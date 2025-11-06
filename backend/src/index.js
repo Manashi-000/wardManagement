@@ -23,6 +23,7 @@ import complaintRouter from "./routes/complaint.route.js";
 import emergencyRouter from "./routes/emergency.route.js";
 import memberRouter from "./routes/member.route.js";
 
+
 app.use("/api/v1/users", usersRouter)
 app.use("/api/v1/organizations", organizationRouter)
 app.use("/api/v1/admins", adminRouter)

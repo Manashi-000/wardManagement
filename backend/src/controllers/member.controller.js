@@ -1,20 +1,28 @@
-import { prisma } from "../utils/validation/prismaClient.js"
+import { prisma } from "../utils/validation/prismaClient.js";
 import { createMemberSchema } from "../utils/validation/member.validation.js";
 
-// ✅ Create a new member
+
 export const createMember = async (req, res) => {
-    console.log("REQ BODY:", req.body);
   try {
-    const parsedData = createMemberSchema.parse(req.body);
+    console.log("REQ BODY:", req.body);
+    console.log("REQ FILE:", req.file);
+
+    const imagePath = req.file ? req.file.filename : null;
+
+    // Combine text data and file data
+    const parsedData = createMemberSchema.parse({
+      ...req.body,
+      image: imagePath,
+    });
 
     const member = await prisma.member.create({
       data: {
-    name: parsedData.name,
-    position: parsedData.position,
-    contactNumber: parsedData.contactNumber,
-    classification: parsedData.classification,
-    image: parsedData.image ?? null,
-  },
+        name: parsedData.name,
+        position: parsedData.position,
+        contactNumber: parsedData.contactNumber,
+        classification: parsedData.classification,
+        image: parsedData.image ?? null,
+      },
     });
 
     res.status(201).json({ message: "Member created successfully", member });
@@ -59,14 +67,21 @@ export const getMember = async (req, res) => {
   }
 };
 
-// ✅ Update member
+// ✅ Update member (with optional file update)
 export const updateMember = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Make all fields optional for update
+    console.log("REQ BODY:", req.body);
+    console.log("REQ FILE:", req.file);
+
+    const imagePath = req.file ? req.file.filename : undefined;
+
     const updateSchema = createMemberSchema.partial();
-    const parsedData = updateSchema.parse(req.body);
+    const parsedData = updateSchema.parse({
+      ...req.body,
+      ...(imagePath && { image: imagePath }),
+    });
 
     const member = await prisma.member.update({
       where: { id: parseInt(id) },
@@ -83,7 +98,7 @@ export const updateMember = async (req, res) => {
   }
 };
 
-// Delete member
+// ✅ Delete member
 export const deleteMember = async (req, res) => {
   try {
     const { id } = req.params;

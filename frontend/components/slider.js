@@ -20,29 +20,31 @@ const Slider = () => {
         width={screenWidth}
         height={230}
         autoPlay={true}
-        autoPlayInterval={3000} 
-        scrollAnimationDuration={1000} 
+        autoPlayInterval={3000} // 3 seconds per slide
+        scrollAnimationDuration={3000} // match interval for smooth sync
         data={sliderData}
         onSnapToItem={(index) => setCurrentIndex(index)}
         renderItem={({ item }) => (
           <ImageBackground
             source={item.image}
-            className="w-full h-64 rounded-lg overflow-hidden justify-center items-center"
+            style={{ width: screenWidth, height: 230, borderRadius: 12 }}
             resizeMode="cover"
           />
         )}
       />
 
       {/* Pagination Dots */}
-      <View className="flex-row justify-center mt-3">
+      <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 8 }}>
         {sliderData.map((_, index) => (
           <View
             key={index}
-            className={`mx-1 rounded-full ${
-              index === currentIndex
-                ? "bg-blue-900 w-3 h-3"
-                : "bg-gray-400 w-3 h-3" 
-            }`}
+            style={{
+              marginHorizontal: 4,
+              borderRadius: 6,
+              width: index === currentIndex ? 10 : 8,
+              height: index === currentIndex ? 10 : 8,
+              backgroundColor: index === currentIndex ? "#003083" : "#ccc",
+            }}
           />
         ))}
       </View>

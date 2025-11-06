@@ -1,5 +1,4 @@
 import { Router } from "express";
-import multer from "multer";
 import {
   createComplaints,
   updateComplaints,
@@ -7,15 +6,17 @@ import {
   adminRespondToComplaint,
   getComplaint,
   getComplaints,
+  getActiveComplaintCount,
 } from "../controllers/complaint.controller.js";
-// configure multer (store files in "uploads/" folder)
-const upload = multer({ dest: "uploads/" });
+import { adminAuthMiddleware, userAuthMiddleware } from "../middlewares/user.auth.js";
+import upload from "../middlewares/multer.middleware.js";
+
 const router = Router()
 router.post("/create-complaints/", upload.array("images", 5), createComplaints);
-router.put("/update-complaints/:complaintID", updateComplaints);
-router.delete("/delete-complaints/:complaintID", deleteComplaints);
+router.put("/update-complaints/:complaintID", userAuthMiddleware, updateComplaints);
+router.delete("/delete-complaints/:complaintID", userAuthMiddleware, deleteComplaints);
 router.get("/get-complaint/:complaintID", getComplaint);
 router.get("/get-complaints", getComplaints);
-router.put("/:complaintID/respond", adminRespondToComplaint);
-
+router.put("/:complaintID/respond", adminAuthMiddleware, adminRespondToComplaint);
+router.get("/count", adminAuthMiddleware, getActiveComplaintCount);
 export default router;

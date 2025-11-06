@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const notice = () => {
+const tax= () => {
   return (
     <View>
       <Text>notice</Text>
@@ -9,6 +9,6 @@ const notice = () => {
   )
 }
 
-export default notice
+export default tax
 
 const styles = StyleSheet.create({})

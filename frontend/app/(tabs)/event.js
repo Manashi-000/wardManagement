@@ -1,24 +1,60 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, Image, Modal, TouchableOpacity } from 'react-native';
-import EventCard from '../../components/EventCard';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  Modal,
+} from "react-native";
+import { Link } from "expo-router";
+import Constants from "expo-constants";
 
-const eventsMock = [
-  { id: 1, title: "Ward Meeting", date: "2025-08-30", description: "Monthly ward meeting at community hall." },
-  { id: 2, title: "Health Camp", date: "2025-08-15", description: "Free health checkup for residents." },
-  { id: 3, title: "Cultural Event", date: "2025-08-01", description: "Local cultural program celebration." },
-];
+const API_URL = Constants.expoConfig?.extra?.backendURL;
+console.log("this is backend url in event", API_URL);
 
 const EventPage = () => {
-  const [activeFilter, setActiveFilter] = useState("day");
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const today = new Date().toISOString().split("T")[0];
   const currentMonth = today.slice(0, 7);
 
-  const filteredEvents = eventsMock.filter(event => {
-    if (activeFilter === 'day') return event.date === today;
-    if (activeFilter === 'month') return event.date.startsWith(currentMonth);
+  
+  const fetchEvents = async () => {
+  try {
+    const endpoint = `${API_URL}/organizations/organization/get-events/`;
+    console.log("Fetching from:", endpoint);
+
+    const res = await fetch(endpoint);
+    const data = await res.json(); // ✅ parse JSON
+
+    // console.log("Fetched event data:", data); // 👈 add this line
+
+    if (!res.ok) throw new Error(data.message || "Failed to load events");
+
+    setEvents(data.data || data.events || data || []);
+  } catch (err) {
+    console.log("Fetch error:", err.message);
+    setError(err.message || "Network error");
+  } finally {
+    setLoading(false);
+  }
+};
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const filteredEvents = events.filter((event) => {
+    if (activeFilter === "day") return event.date === today;
+    if (activeFilter === "month") return event.date?.startsWith(currentMonth);
     return true;
   });
 
@@ -28,91 +64,116 @@ const EventPage = () => {
   };
 
   const closeEvent = () => {
-    setModalVisible(false);
     setSelectedEvent(null);
+    setModalVisible(false);
   };
 
   return (
-    <View className="flex-1 bg-white px-4 pt-6">
-      {/* Header image/banner */}
-      <View className="mb-6 rounded-xl overflow-hidden shadow-lg">
-        <Image
-          source={require('../../assets/images/event.avif')}
-          style={{ width: '100%', height: 160 }}
-          resizeMode="cover"
-          accessible
-          accessibilityLabel="Community events banner"
-        />
-      </View>
+    <View style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <Link href="/(tabs)/home">
+            <Text style={{ fontSize: 26, color: "#003083" }}>←</Text>
+          </Link>
+          <Text style={styles.headerText}>Upcoming Events</Text>
+        </View>
 
-      <Text className="text-3xl font-extrabold text-[#003083] mb-6">Upcoming Events</Text>
+        {/* Banner */}
+        <View style={styles.bannerBox}>
+          <Image
+            source={require("../../assets/images/event.avif")}
+            style={styles.bannerImage}
+            resizeMode="cover"
+          />
+        </View>
 
-      {/* Filter Tabs */}
-      <View className="flex-row justify-around mb-6 bg-gray-100 rounded-full py-1 shadow-sm">
-        {["day", "month", "all"].map(filter => (
-          <Pressable
-            key={filter}
-            onPress={() => setActiveFilter(filter)}
-            className={`px-6 py-2 rounded-full ${
-              activeFilter === filter ? "bg-[#003083]" : "bg-transparent"
-            }`}
-          >
-            <Text className={`text-base font-semibold ${
-              activeFilter === filter ? "text-white" : "text-gray-600"
-            } capitalize`}>
-              {filter}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-
-      {/* Events List */}
-      <ScrollView className="space-y-4" showsVerticalScrollIndicator={false}>
-        {filteredEvents.length ? (
-          filteredEvents.map(event => (
-            <Pressable
-              key={event.id}
-              onPress={() => openEvent(event)}
-              className="bg-[#F0F4FF] rounded-xl border border-[#003083] p-5 shadow-md flex-row items-center space-x-4 mb-3"
+        {/* Filter Tabs */}
+        <View style={styles.filterTabs}>
+          {["day", "month", "all"].map((filter) => (
+            <TouchableOpacity
+              key={filter}
+              onPress={() => setActiveFilter(filter)}
+              style={[
+                styles.filterButton,
+                activeFilter === filter && styles.activeFilter,
+              ]}
             >
-              <View className="bg-[#003083] p-3 rounded-full mr-4">
-                <Text className="text-white font-bold text-lg">📅</Text>
+              <Text
+                style={[
+                  styles.filterText,
+                  activeFilter === filter && styles.activeFilterText,
+                ]}
+              >
+                {filter.toUpperCase()}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Data states */}
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#003083"
+            style={{ marginTop: 30 }}
+          />
+        ) : error ? (
+          <Text style={{ color: "red", textAlign: "center", marginTop: 20 }}>
+            {error}
+          </Text>
+        ) : filteredEvents.length === 0 ? (
+          <Text
+            style={{
+              textAlign: "center",
+              marginTop: 50,
+              color: "#555",
+              fontSize: 16,
+            }}
+          >
+            No events found.
+          </Text>
+        ) : (
+          filteredEvents.map((event) => (
+            <TouchableOpacity
+              key={event.id}
+              style={styles.card}
+              activeOpacity={0.8}
+              onPress={() => openEvent(event)}
+            >
+              <View style={styles.iconBox}>
+                <Text style={styles.iconText}>📅</Text>
               </View>
-              <View className="flex-1">
-                <Text className="text-xl font-bold text-[#003083]">{event.title}</Text>
-                <Text className="text-sm text-gray-700 mb-1">{event.date}</Text>
-                <Text
-                  numberOfLines={2}
-                  className="text-gray-600 italic"
-                >
+              <View style={styles.info}>
+                <Text style={styles.eventTitle}>{event.title}</Text>
+                <Text style={styles.eventDate}>{event.date}</Text>
+                <Text style={styles.eventDesc} numberOfLines={2}>
                   {event.description}
                 </Text>
               </View>
-            </Pressable>
+            </TouchableOpacity>
           ))
-        ) : (
-          <Text className="text-gray-500 text-center mt-20 text-lg">No events found.</Text>
         )}
       </ScrollView>
+
+      {/* Modal */}
       <Modal
+        transparent
         animationType="slide"
-        transparent={true}
         visible={modalVisible}
         onRequestClose={closeEvent}
       >
-        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center px-6">
-          <View className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
-            <Text className="text-2xl font-bold text-[#003083] mb-4">{selectedEvent?.title}</Text>
-            <Text className="text-gray-700 mb-4">{selectedEvent?.date}</Text>
-            <Text className="text-gray-600 mb-6">{selectedEvent?.description}</Text>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>{selectedEvent?.title}</Text>
+            <Text style={styles.modalDate}>{selectedEvent?.date}</Text>
+            <Text style={styles.modalDesc}>{selectedEvent?.description}</Text>
 
             <TouchableOpacity
               onPress={closeEvent}
-              className="self-end bg-[#003083] px-4 py-2 rounded-full"
-              accessibilityRole="button"
-              accessibilityLabel="Close event details"
+              style={styles.closeButton}
             >
-              <Text className="text-white font-semibold">Close</Text>
+              <Text style={styles.closeText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -120,5 +181,95 @@ const EventPage = () => {
     </View>
   );
 };
+
+// ✅ Styles
+const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: "#f2f6ff" },
+  container: { padding: 20, paddingBottom: 40, marginTop: 15 },
+  headerRow: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
+  headerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#003083",
+    marginLeft: 12,
+  },
+  bannerBox: {
+    borderRadius: 12,
+    overflow: "hidden",
+    marginBottom: 20,
+    elevation: 4,
+  },
+  bannerImage: { width: "100%", height: 160 },
+  filterTabs: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#e6f0ff",
+    borderRadius: 30,
+    paddingVertical: 5,
+    marginBottom: 20,
+  },
+  filterButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  activeFilter: { backgroundColor: "#003083" },
+  filterText: { color: "#003083", fontWeight: "600" },
+  activeFilterText: { color: "#fff" },
+  card: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  iconBox: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#d9e6ff",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 15,
+  },
+  iconText: { fontSize: 22 },
+  info: { flex: 1 },
+  eventTitle: { fontSize: 16, fontWeight: "bold", color: "#003083" },
+  eventDate: { fontSize: 14, color: "#003083", marginVertical: 2 },
+  eventDesc: { fontSize: 13, color: "#555" },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBox: {
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 20,
+    width: "85%",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#003083",
+    marginBottom: 8,
+  },
+  modalDate: { color: "#555", marginBottom: 10 },
+  modalDesc: { color: "#444", marginBottom: 15 },
+  closeButton: {
+    backgroundColor: "#003083",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    alignSelf: "flex-end",
+  },
+  closeText: { color: "#fff", fontWeight: "bold" },
+});
 
 export default EventPage;

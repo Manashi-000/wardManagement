@@ -89,22 +89,23 @@ export const getEmergency = async (req, res) => {
 };
 
 export const getEmergencies = async (req, res) => {
-  try {
-    const emergencies = await prisma.emergency.findMany();
-    if (!emergencies || emergencies.length === 0) {
-      return res.status(404).json({ message: "No emergency contacts found" });
+    console.log("get here in emergiecies")
+    try {
+        const emergencies = await prisma.emergency.findMany();
+        if (!emergencies || emergencies.length === 0) {
+            return res.status(404).json({ message: "No emergency contacts found" });
+        }
+        return res.status(200).json({
+            message: "Emergency contacts fetched successfully",
+            data: emergencies,
+        });
+    } catch (error) {
+        console.error("getEmergencies Error:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            error: error.message,
+        });
     }
-    return res.status(200).json({
-      message: "Emergency contacts fetched successfully",
-      data: emergencies,
-    });
-  } catch (error) {
-    console.error("getEmergencies Error:", error);
-    return res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
 };
 
 
