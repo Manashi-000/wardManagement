@@ -15,9 +15,8 @@ import * as ImagePicker from "expo-image-picker";
 import RNPickerSelect from "react-native-picker-select";
 import Constants from "expo-constants";
 
-
 const API_URL = Constants.expoConfig?.extra?.backendURL;
-console.log("this is backend url in complaint", API_URL)
+
 export default function ComplaintScreen() {
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
@@ -26,16 +25,22 @@ export default function ComplaintScreen() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
 
-
   const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission required", "Please allow access to photos.");
+      return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
       quality: 0.7,
     });
 
     if (!result.canceled) {
-      setImages((prev) => [...prev, ...result.assets.map((a) => a.uri)]);
+      const uris = result.assets?.map((a) => a.uri) || [];
+      setImages((prev) => [...prev, ...uris]);
     }
   };
 
@@ -53,29 +58,20 @@ export default function ComplaintScreen() {
       formData.append("taggedLocation", location);
       formData.append("category", category);
 
-      images.forEach((uri, index) => {
-        formData.append("images", {
-          uri,
-          name: `image_${index}.jpg`,
-          type: "image/jpeg",
-        });
+      images.forEach((uri) => {
+        const filename = uri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const type = match ? `image/${match[1]}` : `image`;
+        formData.append("images", { uri, name: filename, type });
       });
 
-      const endpoint = `${API_URL}/complaints/create-complaints/`;
-      console.log("📡 Sending to:", endpoint);
-
-      const res = await fetch(endpoint, {
+      const res = await fetch(`${API_URL}/complaints/create-complaints/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        body: formDataa,
+        body: formData,
       });
 
       const data = await res.json();
-      console.log("✅ Complaint response:", data);
-
-      if (!res.ok) throw new Error(data.message || "Failed to submit");
+      if (!res.ok) throw new Error(data.message);
 
       Alert.alert("✅ Success", "Complaint submitted successfully!");
       setSubject("");
@@ -84,8 +80,7 @@ export default function ComplaintScreen() {
       setCategory("");
       setImages([]);
     } catch (err) {
-      console.log("❌ Upload error:", err.message);
-      Alert.alert("❌ Error", "Failed to submit complaint");
+      Alert.alert("❌ Error", err.message || "Failed to submit complaint");
     } finally {
       setLoading(false);
     }
@@ -93,62 +88,70 @@ export default function ComplaintScreen() {
 
   return (
     <ScrollView className="flex-1 bg-white px-4 py-10">
-      <View className="flex-row items-center mb-4">
+      {/* Header */}
+      <View className="flex-row items-center mb-6">
         <Link href="/(tabs)/home">
-          <Ionicons name="arrow-back" size={24} color="#003083" />
+          <View className="w-10 h-10 rounded-full bg-[#003083] items-center justify-center">
+            <Ionicons name="arrow-back" size={20} color="#fff" />
+          </View>
         </Link>
-        <Text className="text-lg font-semibold ml-4 text-[#003083]">
+
+        <Text className="text-2xl font-bold ml-4 text-[#003083]">
           Lodge Complaint
         </Text>
       </View>
 
+      {/* Subject */}
       <TextInput
-        placeholder="Subject"
+        placeholder="Organization"
         value={subject}
         onChangeText={setSubject}
-        className="bg-gray-100 rounded-lg p-4 text-sm mb-4"
+        className="bg-gray-100 rounded-xl p-4 text-sm mb-4"
       />
+
+      {/* Description */}
       <TextInput
         placeholder="Describe your complaint"
         value={description}
         onChangeText={setDescription}
         multiline
         numberOfLines={6}
-        className="bg-gray-100 rounded-lg p-4 text-sm mb-4 text-[#111]"
+        textAlignVertical="top"
+        className="bg-gray-100 rounded-xl p-4 text-sm mb-6 text-[#111]"
       />
-      <Text className="text-base font-semibold mb-2 text-[#003083]">
+
+      {/* Image Upload */}
+      <Text className="text-lg font-semibold mb-3 text-[#003083]">
         Add Media
       </Text>
-      <View className="border-2 border-dashed border-[#4F6F52] rounded-lg p-6 items-center justify-center mb-6">
+
+      <View className="border-2 border-dashed border-[#4F6F52] rounded-xl p-14 mb-8">
         {images.length > 0 && (
-          <View className="flex-row flex-wrap mb-4">
+          <View className="flex-row flex-wrap mb-5">
             {images.map((uri, idx) => (
               <Image
                 key={idx}
                 source={{ uri }}
-                style={{ width: 80, height: 80, borderRadius: 8, margin: 5 }}
+                style={{
+                  width: 90,
+                  height: 90,
+                  borderRadius: 10,
+                  margin: 6,
+                }}
               />
             ))}
           </View>
         )}
+
         <TouchableOpacity
           onPress={pickImage}
-          className="bg-gray-100 rounded-md px-4 py-2"
+          className="bg-[#e6f0ff] py-3 rounded-lg"
         >
-          <Text className="text-[#4F6F52] font-medium">Upload</Text>
+          <Text className="text-center text-[#003083] font-semibold">
+            Upload Photos
+          </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Location */}
-      <Text className="text-base font-semibold mb-2 text-[#003083]">
-        Location
-      </Text>
-      <TextInput
-        placeholder="Tag Location"
-        value={location}
-        onChangeText={setLocation}
-        className="bg-gray-100 rounded-lg p-4 text-sm mb-6"
-      />
 
       {/* Category */}
       <Text className="text-base font-semibold mb-2 text-[#003083]">
@@ -157,6 +160,8 @@ export default function ComplaintScreen() {
       <View className="bg-gray-100 rounded-lg mb-8">
         <RNPickerSelect
           onValueChange={setCategory}
+          value={category}
+          placeholder={{ label: "Select Category", value: "" }}
           items={[
             { label: "Road", value: "ROAD" },
             { label: "Water", value: "WATER" },
@@ -165,22 +170,20 @@ export default function ComplaintScreen() {
             { label: "Health", value: "HEALTH" },
             { label: "Other", value: "OTHER" },
           ]}
-          value={category}
-          placeholder={{ label: "Select Category", value: "" }}
           style={{
             inputIOS: { padding: 16, fontSize: 14, color: "#111" },
             inputAndroid: { padding: 16, fontSize: 14, color: "#111" },
-            placeholder: { color: "#999" },
           }}
         />
       </View>
 
-      {/* Submit Button */}
+      {/* Submit */}
       <TouchableOpacity
         onPress={handleSubmit}
         disabled={loading}
-        className={`py-4 rounded-xl mb-8 ${loading ? "bg-gray-400" : "bg-[#003083]"
-          }`}
+        className={`py-4 rounded-xl mb-8 ${
+          loading ? "bg-gray-400" : "bg-[#003083]"
+        }`}
       >
         {loading ? (
           <ActivityIndicator color="#fff" />

@@ -1,50 +1,41 @@
-# Welcome to your Expo app 👋
+Keystore type: JKS
+Keystore provider: SUN
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Your keystore contains 1 entry
 
-## Get started
+Alias name: androiddebugkey
+Creation date: Jan 1, 2014
+Entry type: PrivateKeyEntry
+Certificate chain length: 1
+Certificate[1]:
+Owner: CN=Android Debug, OU=Android, O=Unknown, L=Unknown, ST=Unknown, C=US
+Issuer: CN=Android Debug, OU=Android, O=Unknown, L=Unknown, ST=Unknown, C=US
+Serial number: 232eae62
+Valid from: Wed Jan 01 04:20:04 NPT 2014 until: Wed May 01 04:20:04 NPT 2052
+Certificate fingerprints:
+         SHA1: 5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25
+         SHA256: FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C
+Signature algorithm name: SHA1withRSA (weak)
+Subject Public Key Algorithm: 2048-bit RSA key
+Version: 3
 
-1. Install dependencies
+Extensions:
 
-   ```bash
-   npm install
-   ```
+#1: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: 0B F9 FE 38 89 D2 8A 9C   58 F0 C1 0A B7 0E 43 28  ...8....X.....C(
+0010: D8 23 F3 20                                        .#.
+]
+]
 
-2. Start the app
 
-   ```bash
-   npx expo start
-   ```
 
-In the output, you'll find options to open the app in a
+*******************************************
+*******************************************
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Warning:
+<androiddebugkey> uses the SHA1withRSA signature algorithm which is considered a security risk. This algorithm will be disabled in a future update.     
+The JKS keystore uses a proprietary format. It is recommended to migrate to PKCS12 which is an industry standard format using "keytool -importkeystore -srckeystore ./android/app/debug.keystore -destkeystore ./android/app/debug.keystore -deststoretype pkcs12".

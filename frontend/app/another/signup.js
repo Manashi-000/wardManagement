@@ -1,94 +1,201 @@
-// app/signup.js
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignup = async () => {
+  // Handle Google Sign Up
+  const handleGoogleSignup = async () => {
     try {
-      if (!username || !email || !password) {
-        Alert.alert("Error", "Please fill all fields");
-        return;
-      }
-
-      // Example request to backend
-      const res = await fetch("http://localhost:3000/users/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      if (res.ok) {
-        const user = await res.json();
-        Alert.alert("Signup Successful", `Account created for ${user.username}`);
-        router.push("/login"); // Go to login page after signup
-      } else {
-        Alert.alert("Signup Failed", "Please try again");
-      }
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        Alert.alert("Signup Successful", "Welcome with Google!");
+        router.push("/tabs/home");
+      }, 1500);
     } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Something went wrong");
+      setLoading(false);
+      Alert.alert("Signup Failed", "Something went wrong");
     }
   };
 
   return (
-    <View className="flex-1 justify-center px-6 bg-white">
-      <Text className="text-2xl font-bold text-center mb-8" style={{ color: "#003083" }}>
-        Sign Up
-      </Text>
-
-      {/* Username */}
-      <TextInput
-        className="w-full p-3 mb-4 rounded-lg border"
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-        style={{ borderColor: "#4F6F52", borderWidth: 1 }}
-      />
-
-      {/* Email */}
-      <TextInput
-        className="w-full p-3 mb-4 rounded-lg border"
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-        style={{ borderColor: "#4F6F52", borderWidth: 1 }}
-      />
-
-      {/* Password */}
-      <TextInput
-        className="w-full p-3 mb-6 rounded-lg border"
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        style={{ borderColor: "#4F6F52", borderWidth: 1 }}
-      />
-
-      {/* Sign Up Button */}
+    <View style={styles.container}>
+      {/* Back Arrow */}
       <TouchableOpacity
-        onPress={handleSignup}
-        className="w-full p-3 rounded-lg"
-        style={{ backgroundColor: "#003083" }}
+        style={styles.backButton}
+        onPress={() => router.back()}
       >
-        <Text className="text-center text-white font-semibold text-lg">Sign Up</Text>
+        <Ionicons name="arrow-back" size={26} color="#003083" />
       </TouchableOpacity>
 
-      {/* Login Redirect */}
-      <View className="flex-row justify-center mt-4">
-        <Text style={{ color: "#4F6F52" }}>Already have an account?{" "}</Text>
-        <TouchableOpacity onPress={() => router.push("/login")}>
-          <Text style={{ color: "#003083", textDecorationLine: "underline" }}>Login</Text>
-        </TouchableOpacity>
+      {/* Centered Card */}
+      <View style={styles.centeredContainer}>
+        <View style={styles.card}>
+          {/* Illustration */}
+          <Image
+            source={{
+              uri: "https://cdn-icons-png.flaticon.com/512/4140/4140048.png",
+            }}
+            style={styles.userIllustration}
+            resizeMode="contain"
+          />
+
+          {/* Title / Subtitle */}
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Sign up to get started</Text>
+
+          {/* Google Sign Up Button */}
+          <TouchableOpacity
+            style={[styles.googleButton, loading && { opacity: 0.6 }]}
+            onPress={handleGoogleSignup}
+            disabled={loading}
+          >
+            <Image
+              source={{
+                uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png",
+              }}
+              style={styles.googleLogo}
+            />
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.googleButtonText}>Sign Up with Google</Text>
+            )}
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={styles.dividerRow}>
+            <View style={styles.line} />
+            <Text style={styles.orText}>or</Text>
+            <View style={styles.line} />
+          </View>
+
+          {/* Redirect to Login */}
+          <View style={styles.signupRow}>
+            <Text style={styles.signupText}>Already have an account?</Text>
+            <TouchableOpacity onPress={() => router.push("/another/login")}>
+              <Text style={styles.signupLink}>Sign In</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </View>
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#74BFF5", // light blue background
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  backButton: {
+    position: "absolute",
+    top: 60,
+    left: 20,
+    zIndex: 10,
+    backgroundColor: "white",
+    borderRadius: 30,
+    padding: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  centeredContainer: {
+    width: "100%",
+    paddingHorizontal: 20,
+  },
+  card: {
+    backgroundColor: "#E0F2FE",
+    borderRadius: 20,
+    padding: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
+    width: "100%",
+    alignItems: "center",
+  },
+  userIllustration: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#003083",
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#4F6F52",
+    textAlign: "center",
+    marginBottom: 25,
+  },
+  googleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#4285F4",
+    paddingVertical: 14,
+    borderRadius: 10,
+    width: "100%",
+  },
+  googleLogo: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  googleButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 20,
+    width: "100%",
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#ccc",
+  },
+  orText: {
+    marginHorizontal: 10,
+    color: "#555",
+    fontWeight: "500",
+  },
+  signupRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  signupText: {
+    color: "#4F6F52",
+    fontSize: 14,
+  },
+  signupLink: {
+    color: "#003083",
+    textDecorationLine: "underline",
+    fontSize: 14,
+    marginLeft: 5,
+  },
+});

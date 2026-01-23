@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { View, ImageBackground, Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
 const Slider = () => {
   const { width: screenWidth } = Dimensions.get("window");
   const [currentIndex, setCurrentIndex] = useState(0);
+  const carouselRef = useRef(null);
 
   const sliderData = [
     { id: "1", image: require("../assets/images/slider1.png") },
@@ -16,12 +17,13 @@ const Slider = () => {
     <View>
       {/* Carousel */}
       <Carousel
+        ref={carouselRef}
         loop
         width={screenWidth}
         height={230}
         autoPlay={true}
-        autoPlayInterval={3000} // 3 seconds per slide
-        scrollAnimationDuration={3000} // match interval for smooth sync
+        autoPlayInterval={3000} // 3 seconds
+        scrollAnimationDuration={1000} // smooth scroll animation
         data={sliderData}
         onSnapToItem={(index) => setCurrentIndex(index)}
         renderItem={({ item }) => (

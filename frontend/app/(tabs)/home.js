@@ -1,10 +1,10 @@
-// app/tabs/home.js
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Slider from "../../components/slider";
+import PostSlider from '../../components/postSlider';
 
 export default function Home() {
   const router = useRouter();
@@ -18,28 +18,62 @@ export default function Home() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-      <ScrollView className="flex-1 bg-white p-4">
-        <View className="flex-row justify-between items-center mb-4">
-          <View className="flex-row items-center space-x-2">
-            <Text className="text-lg font-semibold">Mero Ward</Text>
-          </View>
-          <Feather name="bell" size={20} />
-        </View>
-       <View className="flex-row items-center mb-4">
-      <TextInput
-        className="flex-1 bg-gray-100 p-2 rounded-lg text-base"
-        placeholder="Search"
-        placeholderTextColor="#888"
-      />  
-      {/* Clickable Profile/Login Button */}
-      <TouchableOpacity
-        onPress={() => router.push("/login")} 
-        className="h-10 w-10 ml-3 rounded-full bg-gray-300 items-center justify-center"
-      >
-      </TouchableOpacity>
-    </View>
+      <ScrollView 
+        className="flex-1 bg-white p-4"
+        contentContainerStyle={{ paddingBottom: 90}}>
+        {/* Header */}
+        <View className="flex-row justify-between items-center mb-5">
+          <Text className="text-xl font-bold" style={{ color: "#003083" }}>
+            Mero Ward
+          </Text>
 
-        <Text className="text-lg text-primary font-semibold mb-4">Quick Access</Text>
+          <TouchableOpacity onPress={() => router.push("/another/notice")}>
+            <Feather name="bell" size={22} color="#003083" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Search Bar */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#f5f8ff",
+            borderRadius: 25,
+            paddingHorizontal: 15,
+            paddingVertical: 8,
+            marginBottom: 20,
+          }}
+        >
+          <Feather name="search" size={18} color="#003083" />
+          <TextInput
+            style={{
+              flex: 1,
+              fontSize: 15,
+              color: "#003083",
+              marginLeft: 10,
+            }}
+            placeholder="Search anything..."
+            placeholderTextColor="#777"
+          />
+          <TouchableOpacity
+            onPress={() => router.push("/another/settings")}
+            style={{
+              height: 36,
+              width: 36,
+              borderRadius: 18,
+              backgroundColor: "#003083",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Feather name="user" size={18} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Quick Access */}
+        <Text className="text-lg font-semibold mb-4" style={{ color: "#003083" }}>
+          Quick Access
+        </Text>
 
         <View className="flex-row flex-wrap justify-between">
           {quickAccess.map((item, index) => (
@@ -53,9 +87,15 @@ export default function Home() {
             </TouchableOpacity>
           ))}
         </View>
+
         <View className="mt-6">
-        <Slider />
-      </View>
+          <Slider />
+        </View>
+
+        <View className="mt-6">
+          <PostSlider />
+        </View>
+
       </ScrollView>
     </SafeAreaView>
   );

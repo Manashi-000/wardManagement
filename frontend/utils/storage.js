@@ -1,0 +1,6 @@
+// utils/storage.js
+import * as SecureStore from "expo-secure-store";
+
+export const saveToken = async (token) => await SecureStore.setItemAsync("token", token);
+export const getToken = async () => await SecureStore.getItemAsync("token");
+export const removeToken = async () => await SecureStore.deleteItemAsync("token");
