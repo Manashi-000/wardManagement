@@ -13,8 +13,9 @@
       "googleClient": "",
       "googleSecret": "",
       "googleAndroidClientId": "",
+      "router": {},
       "eas": {
-        "projectId": "d0bc1125-c748-4852-8db0-ac06178e2c2d"
+        "projectId": "befc2216-8bed-4e02-9da1-f71dcadb312c"
       }
     },
     "ios": {
@@ -28,11 +29,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "config": {
-        "googleMaps": {
-          "apiKey": ""
-        }
-      }
+      "predectiveBackGestureEnabled": false
     },
     "web": {
       "bundler": "metro",

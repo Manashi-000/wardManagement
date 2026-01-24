@@ -14,8 +14,8 @@ export default function Index() {
 					router.replace("/(tabs)/home");  
 				} else {
 					//console.log("redirected from here")
-					//router.replace("/login");  
-					 router.replace("/(tabs)/home");      
+					router.replace("/login");  
+					// router.replace("/(tabs)/home");      
 				}
 			}, 1500);
 		};
