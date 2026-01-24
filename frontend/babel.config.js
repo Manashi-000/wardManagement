@@ -7,8 +7,9 @@ module.exports = function (api) {
 		],
 		plugins: [
 			["module:react-native-dotenv", { moduleName: "@env", path: ".env" }],
+			["@babel/plugin-proposal-decorators", { legacy: true }],
+			"./babel-plugin-react-native-worklets-stub.js",
 			"react-native-reanimated/plugin", // MUST be last
-			// "react-native-worklets/plugin",
 		],
 	};
 };

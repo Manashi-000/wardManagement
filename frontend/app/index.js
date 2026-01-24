@@ -11,11 +11,9 @@ export default function Index() {
 			const token = await SecureStore.getItemAsync("userToken");
 			setTimeout(() => {
 				if (token) {
-					router.replace("/(tabs)/home");  
+					router.replace("/(tabs)/home");
 				} else {
-					//console.log("redirected from here")
-					router.replace("/login");  
-					// router.replace("/(tabs)/home");      
+					router.replace("/login");
 				}
 			}, 1500);
 		};
@@ -26,12 +24,21 @@ export default function Index() {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>Ward Management System 🚀</Text>
-			<ActivityIndicator size="large" color="#003083" style={{ marginTop: 20 }} />
+			<ActivityIndicator
+				size="large"
+				color="#003083"
+				style={{ marginTop: 20 }}
+			/>
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" },
+	container: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#fff",
+	},
 	title: { fontSize: 24, fontWeight: "bold", color: "#003083" },
 });

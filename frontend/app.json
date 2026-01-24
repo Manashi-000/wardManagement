@@ -1,59 +1,58 @@
 {
-  "expo": {
-    "name": "frontend",
-    "slug": "frontend",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "frontend",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "extra": {
-      "backendURL": "http://localhost:8000",
-      "googleClient": "",
-      "googleSecret": "",
-      "googleAndroidClientId": "",
-      "router": {},
-      "eas": {
-        "projectId": "befc2216-8bed-4e02-9da1-f71dcadb312c"
-      }
-    },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.manashi.frontend"
-    },
-    "android": {
-      "package": "com.manashi.frontend",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "predectiveBackGestureEnabled": false
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
-      [
-        "@react-native-google-signin/google-signin",
-        {
-          "iosUrlScheme": "com.googleusercontent.apps.548956848493-hlrcfos8mer7v5co5iaglmb5vh2nf1bk"
-        }
-      ]
-    ],
-    "owner": "manashi"
-  }
+	"expo": {
+		"name": "frontend",
+		"slug": "frontend",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/images/icon.png",
+		"scheme": "frontend",
+		"userInterfaceStyle": "automatic",
+		"newArchEnabled": true,
+		"extra": {
+			"backendURL": "http://localhost:8000",
+			"googleClient": "548956848493-lpug5ab8lu37tfutddjmmdn99rv8389o.apps.googleusercontent.com",
+			"googleIosClientId": "548956848493-hlrcfos8mer7v5co5iaglmb5vh2nf1bk.apps.googleusercontent.com",
+			"router": {},
+			"eas": {
+				"projectId": "6e1138da-bda6-43bb-84fd-e4e26b70365a"
+			}
+		},
+		"ios": {
+			"supportsTablet": true,
+			"bundleIdentifier": "com.manashi.frontend"
+		},
+		"android": {
+			"package": "com.manashi.frontend",
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/images/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
+			},
+			"edgeToEdgeEnabled": true,
+			"predictiveBackGestureEnabled": false
+		},
+		"web": {
+			"bundler": "metro",
+			"output": "static",
+			"favicon": "./assets/images/favicon.png"
+		},
+		"plugins": [
+			"expo-router",
+			[
+				"expo-splash-screen",
+				{
+					"image": "./assets/images/splash-icon.png",
+					"imageWidth": 200,
+					"resizeMode": "contain",
+					"backgroundColor": "#ffffff"
+				}
+			],
+			[
+				"@react-native-google-signin/google-signin",
+				{
+					"iosUrlScheme": "com.googleusercontent.apps.548956848493-hlrcfos8mer7v5co5iaglmb5vh2nf1bk"
+				}
+			]
+		],
+		"owner": "manashi"
+	}
 }
