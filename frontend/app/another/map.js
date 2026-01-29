@@ -6,7 +6,7 @@ import MapView, { Marker } from "react-native-maps";
 
 const API_URL = Constants.expoConfig?.extra?.backendURL;
 
-console.log("this is backend url", API_URL);
+//console.log("this is backend url", API_URL);
 const MapScreen = () => {
 	return (
 		<View style={styles.container}>

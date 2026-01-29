@@ -1,0 +1,6 @@
+1 make names visible in organization creatiopn details
+2 maybe make longitude and latitude disappear and add the location codes used in google maps or normally used for location
+3 make the organization created message disappear after sometime
+4 fix the future date issue in organization creatiop
+5 delete garda make sure wala prompt box banau
+6 make validation for every admin action
